@@ -6,11 +6,21 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-
+import { Theme, ThemePanel } from "@radix-ui/themes";
 import type { Route } from "./+types/root";
-import "./app.css";
+
+import radixui from "@radix-ui/themes/styles.css?url";
+import appcss from "./app.css?url";
 
 export const links: Route.LinksFunction = () => [
+  {
+    rel: "stylesheet",
+    href: appcss,
+  },
+  {
+    rel: "stylesheet",
+    href: radixui,
+  },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -42,7 +52,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <Theme>
+      <Outlet />
+      {process.env.NODE_ENV === "development" && (
+        <ThemePanel defaultOpen={false} />
+      )}
+    </Theme>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
