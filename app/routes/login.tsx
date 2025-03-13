@@ -47,12 +47,12 @@ export default function Login() {
             </Box>
 
             <Text size="6" weight="bold" align="center">
-              Wilujeng sumping di Room
+              Selamat datang di Room
             </Text>
             <Text as="p" align="center">
-              Teu acan gaduh akun?{" "}
+              Belum memiliki akun?{" "}
               <Link to="/register" className="underline">
-                Ngadamel hula
+                Daftar
               </Link>
             </Text>
           </Grid>
@@ -95,7 +95,7 @@ export default function Login() {
             </TextField.Root>
           </Grid>
           <Button type="submit" size="3">
-            Lebet
+            Masuk
           </Button>
         </Grid>
       </Form>

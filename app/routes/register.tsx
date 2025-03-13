@@ -29,19 +29,19 @@ export default function Register() {
             </Box>
 
             <Text size="6" weight="bold" align="center">
-              Wilujeng sumping di Room
+              Selamat datang di Room
             </Text>
             <Text as="p" align="center">
-              Atos gaduh akun?{" "}
+              Sudah memiliki akun?{" "}
               <Link to="/login" style={{ textDecoration: "underline" }}>
-                Mangga lebet
+                Masuk
               </Link>
             </Text>
           </Grid>
 
           <Grid gap="1">
             <Text as="label" htmlFor="full_name">
-              Nami Lengkap
+              Nama Lengkap
             </Text>
             <TextField.Root
               size="3"
@@ -49,7 +49,7 @@ export default function Register() {
               name="full_name"
               required
               type="text"
-              placeholder="Asep wetan"
+              placeholder="John Doe"
               min={6}
             >
               <TextField.Slot>
@@ -96,7 +96,7 @@ export default function Register() {
             </TextField.Root>
           </Grid>
           <Button type="submit" size="3">
-            Ngadamel akun
+            Register
           </Button>
         </Grid>
       </Form>
