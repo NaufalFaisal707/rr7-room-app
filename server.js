@@ -3,6 +3,7 @@ import express from "express";
 import morgan from "morgan";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { PrismaClient } from "@prisma/client";
 
 // Short-circuit the type-checking of the built output.
 const BUILD_PATH = "./build/server/index.js";
@@ -11,10 +12,13 @@ const PORT = Number.parseInt(process.env.PORT || "3000");
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer);
+const io = new Server(httpServer, { cookie: true });
+
+// initial prisma client for socket.io connection
+const prisma = new PrismaClient();
 
 // socket.io connection
-io.on("connection", ({ id }) => {
+io.on("connection", async ({ id }) => {
   console.log("A user connected:", id);
 });
 

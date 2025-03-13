@@ -10,24 +10,66 @@ import {
 } from "@radix-ui/themes";
 import { GroupIcon, KeyRound, User2 } from "lucide-react";
 
-import { Form, Link } from "react-router";
+import { Form, Link, replace } from "react-router";
+import { accessCookie, refreshCookie } from "~/lib/cookie";
+import { generateAccessToken, generateRefreshToken } from "~/lib/jwt";
 
 export const meta: Route.MetaFunction = () => [{ title: "Login" }];
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
   const { prisma } = context;
 
-  const formData = Object.fromEntries(await request.formData());
-
-  if (!formData.username || !formData.password) {
-    return null;
+  if (
+    !request.headers
+      .get("Content-Type")
+      ?.includes("application/x-www-form-urlencoded")
+  ) {
+    return new Response(null, {
+      status: 415,
+      statusText:
+        "Unsupported Media Type - Expected 'application/x-www-form-urlencoded'",
+    });
   }
 
-  const findUserByUnique = await prisma.user.findMany();
+  const { username, password } = Object.fromEntries(
+    await request.formData()
+  ) as {
+    username: string;
+    password: string;
+  };
 
-  console.log(formData, findUserByUnique);
+  if (!username || !password) {
+    return new Response(null, {
+      status: 400,
+      statusText: "Missing username or password",
+    });
+  }
 
-  return null;
+  const findUserByUnique = await prisma.user.findUnique({
+    where: {
+      username,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!findUserByUnique) {
+    return new Response(null, {
+      status: 404,
+      statusText: "Account does not exist",
+    });
+  }
+
+  const gat = generateAccessToken(findUserByUnique.id);
+  const grt = generateRefreshToken(findUserByUnique.id);
+
+  return replace("/", {
+    headers: [
+      ["Set-Cookie", await accessCookie.serialize(gat)],
+      ["Set-Cookie", await refreshCookie.serialize(grt)],
+    ],
+  });
 };
 
 export default function Login() {
@@ -69,6 +111,8 @@ export default function Login() {
               type="text"
               placeholder="username"
               min={6}
+              max={24}
+              autoComplete="off"
             >
               <TextField.Slot>
                 <User2 />

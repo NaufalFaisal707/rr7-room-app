@@ -11,18 +11,15 @@ declare module "react-router" {
   }
 }
 
-// initial prisma client
+// initial prisma client for React Router connection
 const prisma = new PrismaClient().$extends({
   query: {
     async $allOperations({ operation, args, model, query }) {
-      if (operation === "create" && model === "User" && args.data?.password) {
-        args.data.password = await hash(args.data.password, 10);
-        return query(args);
-      }
-
-      if (operation === "update" && model === "User" && args.data?.password) {
-        args.data.password = await hash(args.data.password, 10);
-        return query(args);
+      if (operation === "create" || operation === "update") {
+        if (model === "User" && args.data?.password) {
+          args.data.password = await hash(args.data.password, 10);
+          return query(args);
+        }
       }
 
       return await query(args);

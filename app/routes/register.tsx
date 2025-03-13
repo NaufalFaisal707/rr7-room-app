@@ -1,3 +1,4 @@
+import type { Route } from "./+types/register";
 import {
   Flex,
   Grid,
@@ -7,10 +8,77 @@ import {
   Button,
   Text,
 } from "@radix-ui/themes";
-import { Form, Link, type MetaFunction } from "react-router";
+import { Form, Link, replace, type MetaFunction } from "react-router";
 import { GroupIcon, User2, KeyRound } from "lucide-react";
+import { accessCookie, refreshCookie } from "~/lib/cookie";
+import { generateAccessToken, generateRefreshToken } from "~/lib/jwt";
 
 export const meta: MetaFunction = () => [{ title: "Register" }];
+
+export const action = async ({ request, context }: Route.ActionArgs) => {
+  const { prisma } = context;
+
+  if (
+    !request.headers
+      .get("Content-Type")
+      ?.includes("application/x-www-form-urlencoded")
+  ) {
+    return new Response(null, {
+      status: 415,
+      statusText:
+        "Unsupported Media Type - Expected 'application/x-www-form-urlencoded'",
+    });
+  }
+
+  const { full_name, username, password } = Object.fromEntries(
+    await request.formData()
+  ) as {
+    full_name: string;
+    username: string;
+    password: string;
+  };
+
+  if (!full_name || !username || !password) {
+    return new Response(null, {
+      status: 400,
+      statusText: "Missing full name, username or password",
+    });
+  }
+
+  const findUserByUnique = await prisma.user.findUnique({
+    where: {
+      username,
+    },
+  });
+
+  if (findUserByUnique) {
+    return new Response(null, {
+      status: 400,
+      statusText: "Account already exists",
+    });
+  }
+
+  const createdUser = await prisma.user.create({
+    data: {
+      full_name,
+      username,
+      password,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  const gat = generateAccessToken(createdUser.id);
+  const grt = generateRefreshToken(createdUser.id);
+
+  return replace("/", {
+    headers: [
+      ["Set-Cookie", await accessCookie.serialize(gat)],
+      ["Set-Cookie", await refreshCookie.serialize(grt)],
+    ],
+  });
+};
 
 export default function Register() {
   return (
@@ -50,7 +118,9 @@ export default function Register() {
               required
               type="text"
               placeholder="John Doe"
+              autoComplete="off"
               min={6}
+              max={48}
             >
               <TextField.Slot>
                 <User2 />
@@ -69,7 +139,9 @@ export default function Register() {
               required
               type="text"
               placeholder="username"
+              autoComplete="off"
               min={6}
+              max={32}
             >
               <TextField.Slot>
                 <User2 />
