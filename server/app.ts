@@ -3,11 +3,33 @@ import { createRequestHandler } from "@react-router/express";
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import {
+  accessCookie,
+  refreshCookie,
+  clearAccessCookie,
+  clearRefreshCookie,
+} from "./lib/cookie";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyAccessToken,
+  verifyRefreshToken,
+} from "./lib/jwt";
+import type { JwtPayload } from "jsonwebtoken";
+import type { Cookie } from "react-router";
 const { hash } = bcrypt;
 
 declare module "react-router" {
   interface AppLoadContext {
     prisma: PrismaClient;
+    accessCookie: Cookie;
+    refreshCookie: Cookie;
+    clearAccessCookie: Cookie;
+    clearRefreshCookie: Cookie;
+    generateAccessToken: (value: string) => string;
+    generateRefreshToken: (value: string) => string;
+    verifyAccessToken: (token: string) => string | JwtPayload | null;
+    verifyRefreshToken: (token: string) => string | JwtPayload | null;
   }
 }
 
@@ -36,6 +58,14 @@ app.use(
     getLoadContext() {
       return {
         prisma: prisma as PrismaClient,
+        accessCookie,
+        refreshCookie,
+        clearAccessCookie,
+        clearRefreshCookie,
+        generateAccessToken,
+        generateRefreshToken,
+        verifyAccessToken,
+        verifyRefreshToken,
       };
     },
   })

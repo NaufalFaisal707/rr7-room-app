@@ -4,6 +4,8 @@ import morgan from "morgan";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { PrismaClient } from "@prisma/client";
+import { verifyAccessToken } from "./server/lib/jwt.js";
+import { accessCookie } from "./server/lib/cookie.js";
 
 // Short-circuit the type-checking of the built output.
 const BUILD_PATH = "./build/server/index.js";
@@ -16,6 +18,23 @@ const io = new Server(httpServer);
 
 // initial prisma client for socket.io connection
 const prisma = new PrismaClient();
+
+// socket.io middleware
+io.use(async (socket, next) => {
+  const { cookie } = socket.handshake.headers;
+
+  if (!cookie) {
+    return next(new Error("No cookie provided"));
+  }
+
+  const acp = verifyAccessToken(await accessCookie.parse(cookie));
+
+  if (!acp) {
+    return next(new Error("Invalid access token"));
+  }
+
+  next();
+});
 
 // socket.io connection
 io.on("connection", async ({ id }) => {

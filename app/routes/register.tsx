@@ -10,13 +10,17 @@ import {
 } from "@radix-ui/themes";
 import { Form, Link, replace, type MetaFunction } from "react-router";
 import { GroupIcon, User2, KeyRound } from "lucide-react";
-import { accessCookie, refreshCookie } from "~/lib/cookie";
-import { generateAccessToken, generateRefreshToken } from "~/lib/jwt";
 
 export const meta: MetaFunction = () => [{ title: "Register" }];
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  const { prisma } = context;
+  const {
+    prisma,
+    accessCookie,
+    refreshCookie,
+    generateAccessToken,
+    generateRefreshToken,
+  } = context;
 
   if (
     !request.headers

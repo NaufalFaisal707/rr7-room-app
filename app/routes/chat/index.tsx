@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useUser } from "~/context";
 
 export default function ChatIndex() {

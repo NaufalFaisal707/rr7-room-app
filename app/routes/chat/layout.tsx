@@ -1,27 +1,21 @@
 import type { Route } from "./+types/layout";
 import { useEffect, useState } from "react";
-import { Outlet, redirect, replace, useLoaderData } from "react-router";
+import { Outlet, redirect, replace } from "react-router";
 import { io, type Socket } from "socket.io-client";
-import {
-  SocketProvider,
-  UserProvider,
-  useUser,
-  type SafeUser,
-} from "~/context";
-import {
-  accessCookie,
-  clearAccessCookie,
-  clearRefreshCookie,
-  refreshCookie,
-} from "~/lib/cookie";
-import {
-  generateAccessToken,
-  verifyAccessToken,
-  verifyRefreshToken,
-} from "~/lib/jwt";
+import { SocketProvider, UserProvider, type SafeUser } from "~/context";
 
 export const loader = async ({ request, context }: Route.LoaderArgs) => {
-  const { prisma } = context;
+  const {
+    prisma,
+    verifyAccessToken,
+    verifyRefreshToken,
+    accessCookie,
+    refreshCookie,
+    clearAccessCookie,
+    clearRefreshCookie,
+    generateAccessToken,
+    generateRefreshToken,
+  } = context;
 
   const getAllCookies = request.headers.get("Cookie");
 

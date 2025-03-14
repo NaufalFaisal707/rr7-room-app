@@ -11,13 +11,17 @@ import {
 import { GroupIcon, KeyRound, User2 } from "lucide-react";
 
 import { Form, Link, replace } from "react-router";
-import { accessCookie, refreshCookie } from "~/lib/cookie";
-import { generateAccessToken, generateRefreshToken } from "~/lib/jwt";
 
 export const meta: Route.MetaFunction = () => [{ title: "Login" }];
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  const { prisma } = context;
+  const {
+    prisma,
+    accessCookie,
+    refreshCookie,
+    generateAccessToken,
+    generateRefreshToken,
+  } = context;
 
   if (
     !request.headers
