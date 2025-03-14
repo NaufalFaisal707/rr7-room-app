@@ -1,3 +1,13 @@
+import { useEffect } from "react";
+import { useUser } from "~/context";
+
 export default function ChatIndex() {
-  return <h1>hallo index (chat)</h1>;
+  const { user } = useUser();
+
+  return (
+    <>
+      {user && <p>Welcome, {user.full_name}!</p>}
+      <h1>hallo index (chat)</h1>
+    </>
+  );
 }

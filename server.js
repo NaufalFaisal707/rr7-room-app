@@ -12,7 +12,7 @@ const PORT = Number.parseInt(process.env.PORT || "3000");
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer, { cookie: true });
+const io = new Server(httpServer);
 
 // initial prisma client for socket.io connection
 const prisma = new PrismaClient();

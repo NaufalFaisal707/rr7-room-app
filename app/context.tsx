@@ -20,7 +20,7 @@ export function SocketProvider({ socket, children }: SocketProviderProps) {
   );
 }
 
-type SafeUser = Omit<User, "password">;
+export type SafeUser = Omit<User, "password">;
 
 type UserContextType = {
   user: SafeUser | undefined;
@@ -36,9 +36,11 @@ export function useUser() {
   return useContext(UserContext);
 }
 
-export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<SafeUser | undefined>(undefined);
-
+export function UserProvider({
+  user,
+  setUser,
+  children,
+}: { children: ReactNode } & UserContextType) {
   return (
     <UserContext.Provider value={{ user, setUser }}>
       {children}
