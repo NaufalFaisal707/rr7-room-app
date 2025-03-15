@@ -19,6 +19,5 @@ model User {
   username   String    @unique @db.VarChar(24)
   created_at DateTime  @unique @default(now())
   full_name  String    @db.VarChar(48)
-  logout     Boolean   @default(false)
   logout_at  DateTime?
 }

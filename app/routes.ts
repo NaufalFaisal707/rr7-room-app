@@ -8,6 +8,7 @@ import {
 export default [
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
+  route("logout", "routes/logout.ts"),
 
   layout("routes/chat/layout.tsx", [index("routes/chat/index.tsx")]),
 ] satisfies RouteConfig;
