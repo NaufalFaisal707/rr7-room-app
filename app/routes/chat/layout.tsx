@@ -1,7 +1,7 @@
-import { Box, Container, Flex, ScrollArea } from "@radix-ui/themes";
+import { Box, Button, Container, Flex, ScrollArea } from "@radix-ui/themes";
 import type { Route } from "./+types/layout";
 import { useEffect, useState } from "react";
-import { Outlet, redirect, replace } from "react-router";
+import { Link, Outlet, redirect, replace } from "react-router";
 import { io, type Socket } from "socket.io-client";
 import { SocketProvider, UserProvider, type SafeUser } from "~/context";
 
@@ -15,7 +15,6 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
     clearAccessCookie,
     clearRefreshCookie,
     generateAccessToken,
-    generateRefreshToken,
   } = context;
 
   const getAllCookies = request.headers.get("Cookie");
@@ -118,6 +117,9 @@ export default function ChatLayout({ loaderData }: Route.ComponentProps) {
     <SocketProvider socket={socket}>
       <UserProvider user={user} setUser={setUser}>
         <>
+          <Button asChild>
+            <Link to="/logout">Logout</Link>
+          </Button>
           <Outlet />
         </>
       </UserProvider>

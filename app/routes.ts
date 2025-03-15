@@ -10,5 +10,8 @@ export default [
   route("register", "routes/register.tsx"),
   route("logout", "routes/logout.ts"),
 
-  layout("routes/chat/layout.tsx", [index("routes/chat/index.tsx")]),
+  layout("routes/chat/layout.tsx", [
+    index("routes/chat/index.tsx"),
+    route(":frendId", "routes/chat/$frendId.tsx"),
+  ]),
 ] satisfies RouteConfig;
