@@ -98,20 +98,26 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
 
 export default function ChatLayout({ loaderData }: Route.ComponentProps) {
   const [user, setUser] = useState<SafeUser>();
+  const [socket, setSocket] = useState<Socket>();
+  const [friends, setFriends] = useState<SafeUser[]>([]);
 
   useEffect(() => {
     setUser(loaderData);
   }, []);
 
-  const [socket, setSocket] = useState<Socket>();
-
   useEffect(() => {
     const socket = io();
     setSocket(socket);
+
+    socket.emit("fetchFriendList", user?.id);
+
+    socket.on("friendList", setFriends);
+
     return () => {
       socket.close();
+      socket.off("frendList");
     };
-  }, []);
+  }, [user]);
 
   return (
     <SocketProvider socket={socket}>
@@ -120,6 +126,7 @@ export default function ChatLayout({ loaderData }: Route.ComponentProps) {
           <Button asChild>
             <Link to="/logout">Logout</Link>
           </Button>
+          <h2>{JSON.stringify(friends)}</h2>
           <Outlet />
         </>
       </UserProvider>

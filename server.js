@@ -37,8 +37,26 @@ io.use(async (socket, next) => {
 });
 
 // socket.io connection
-io.on("connection", async ({ id }) => {
+io.on("connection", async (socket) => {
+  const { id } = socket;
+
   console.log("A user connected:", id);
+
+  socket.on("fetchFriendList", async (userId) => {
+    const findUserFriendList = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        friends: {
+          select: {
+            id: true,
+            full_name: true,
+          },
+        },
+      },
+    });
+
+    socket.emit("friendList", findUserFriendList?.friends || []);
+  });
 });
 
 app.use(compression());

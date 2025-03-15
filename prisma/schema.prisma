@@ -20,17 +20,6 @@ model User {
   created_at    DateTime        @unique @default(now())
   full_name     String          @db.VarChar(48)
   logout_at     DateTime?
-  frends        Frends[]       @relation("UserToFrends")
-  frendOf       Frends[]       @relation("FrendsToUser")
-}
-
-model Frends {
-  id            String          @id @default(cuid())
-  user          User            @relation("UserToFrends", fields: [userId], references: [id])
-  userId        String
-  frend         User            @relation("FrendsToUser", fields: [frendId], references: [id])
-  frendId       String
-  created_at    DateTime        @default(now())
-
-  @@unique([userId, frendId])
+  friends       User[]         @relation("UserFriends")
+  friendOf      User[]         @relation("UserFriends")
 }
