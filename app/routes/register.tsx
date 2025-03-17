@@ -7,9 +7,18 @@ import {
   TextField,
   Button,
   Text,
+  Callout,
 } from "@radix-ui/themes";
-import { Form, Link, replace, type MetaFunction } from "react-router";
-import { GroupIcon, User2, KeyRound } from "lucide-react";
+import {
+  Form,
+  isRouteErrorResponse,
+  Link,
+  replace,
+  type ErrorResponse,
+  type MetaFunction,
+} from "react-router";
+import { GroupIcon, User2, KeyRound, InfoIcon } from "lucide-react";
+import ErrorInstance from "~/components/error-instance";
 
 export const meta: MetaFunction = () => [{ title: "Register" }];
 
@@ -27,7 +36,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       .get("Content-Type")
       ?.includes("application/x-www-form-urlencoded")
   ) {
-    return new Response(null, {
+    throw new Response(null, {
       status: 415,
       statusText:
         "Unsupported Media Type - Expected 'application/x-www-form-urlencoded'",
@@ -43,7 +52,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   };
 
   if (!full_name || !username || !password) {
-    return new Response(null, {
+    throw new Response(null, {
       status: 400,
       statusText: "Missing full name, username or password",
     });
@@ -56,7 +65,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   });
 
   if (findUserByUnique) {
-    return new Response(null, {
+    throw new Response(null, {
       status: 400,
       statusText: "Account already exists",
     });
@@ -84,7 +93,24 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   });
 };
 
+export const ErrorBoundary = ({ error }: Route.ErrorBoundaryProps) => {
+  if (isRouteErrorResponse(error)) {
+    return <RegisterComponent error={error} />;
+  }
+
+  return (
+    <>
+      <ErrorInstance error={error} />
+      <RegisterComponent />
+    </>
+  );
+};
+
 export default function Register() {
+  return <RegisterComponent />;
+}
+
+function RegisterComponent({ error }: { error?: ErrorResponse }) {
   return (
     <Flex
       direction="column"
@@ -110,6 +136,17 @@ export default function Register() {
               </Link>
             </Text>
           </Grid>
+
+          {error && (
+            <Callout.Root>
+              <Callout.Icon>
+                <InfoIcon />
+              </Callout.Icon>
+              <Callout.Text style={{ maxWidth: "200px" }}>
+                {error.statusText}
+              </Callout.Text>
+            </Callout.Root>
+          )}
 
           <Grid gap="1">
             <Text as="label" htmlFor="full_name">

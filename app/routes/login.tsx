@@ -7,10 +7,18 @@ import {
   Button,
   Box,
   Avatar,
+  Callout,
 } from "@radix-ui/themes";
-import { GroupIcon, KeyRound, User2 } from "lucide-react";
+import { GroupIcon, InfoIcon, KeyRound, User2 } from "lucide-react";
 
-import { Form, Link, replace } from "react-router";
+import {
+  Form,
+  isRouteErrorResponse,
+  Link,
+  replace,
+  type ErrorResponse,
+} from "react-router";
+import ErrorInstance from "~/components/error-instance";
 
 export const meta: Route.MetaFunction = () => [{ title: "Login" }];
 
@@ -28,7 +36,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
       .get("Content-Type")
       ?.includes("application/x-www-form-urlencoded")
   ) {
-    return new Response(null, {
+    throw new Response(null, {
       status: 415,
       statusText:
         "Unsupported Media Type - Expected 'application/x-www-form-urlencoded'",
@@ -43,7 +51,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   };
 
   if (!username || !password) {
-    return new Response(null, {
+    throw new Response(null, {
       status: 400,
       statusText: "Missing username or password",
     });
@@ -59,7 +67,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   });
 
   if (!findUserByUnique) {
-    return new Response(null, {
+    throw new Response(null, {
       status: 404,
       statusText: "Account does not exist",
     });
@@ -76,7 +84,24 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   });
 };
 
+export const ErrorBoundary = ({ error }: Route.ErrorBoundaryProps) => {
+  if (isRouteErrorResponse(error)) {
+    return <LoginComponent error={error} />;
+  }
+
+  return (
+    <>
+      <ErrorInstance error={error} />
+      <LoginComponent />
+    </>
+  );
+};
+
 export default function Login() {
+  return <LoginComponent />;
+}
+
+function LoginComponent({ error }: { error?: ErrorResponse }) {
   return (
     <Flex
       direction="column"
@@ -102,6 +127,17 @@ export default function Login() {
               </Link>
             </Text>
           </Grid>
+
+          {error && (
+            <Callout.Root>
+              <Callout.Icon>
+                <InfoIcon />
+              </Callout.Icon>
+              <Callout.Text style={{ maxWidth: "200px" }}>
+                {error.statusText}
+              </Callout.Text>
+            </Callout.Root>
+          )}
 
           <Grid gap="1">
             <Text as="label" htmlFor="username">
