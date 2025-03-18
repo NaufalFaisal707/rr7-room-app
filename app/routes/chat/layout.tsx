@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   Card,
@@ -18,10 +19,16 @@ import { io, type Socket } from "socket.io-client";
 import { SocketProvider, UserProvider, type SafeUser } from "~/context";
 import {
   Bell,
+  ChevronsUpDown,
+  GroupIcon,
   LucideUserRoundPlus,
+  LucideX,
+  Plus,
   PlusIcon,
   Search,
+  User,
   UserPlus2,
+  UserRound,
   UserRoundPlus,
 } from "lucide-react";
 
@@ -50,6 +57,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
       select: {
         id: true,
         full_name: true,
+        username: true,
         created_at: true,
         logout_at: true,
       },
@@ -80,6 +88,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
       select: {
         id: true,
         full_name: true,
+        username: true,
         created_at: true,
         logout_at: true,
       },
@@ -164,7 +173,10 @@ export default function ChatLayout({ loaderData }: Route.ComponentProps) {
                           </Text>
                         </Box>
                         <IconButton size="3" variant="soft" radius="full">
-                          <UserRoundPlus />
+                          <Plus />
+                        </IconButton>
+                        <IconButton size="3" variant="soft" radius="full">
+                          <UserRound />
                         </IconButton>
                       </Flex>
 
@@ -200,109 +212,22 @@ export default function ChatLayout({ loaderData }: Route.ComponentProps) {
                           </Text>
                         </Tabs.Content>
                       </Box>
-
-                      <Box>Profile</Box>
                     </Flex>
                   </Tabs.Root>
-                  {/* <Box>tag</Box>
-
-                    <ScrollArea scrollbars="vertical">
-                      <Flex direction="column" flexGrow="1">
-                        {friends.map(({ id, full_name }) => {
-                          return <Box>{full_name}</Box>;
-                        })}
-                      </Flex>
-                    </ScrollArea>
-                    */}
 
                   <Box>
                     <Separator orientation="vertical" size="4" mx="2" />
                   </Box>
+
                   <Flex flexGrow="1" direction="column" minWidth="32rem">
                     <Outlet />
-                    {/* <Box>Chat Name</Box>
-
-                  <ScrollArea scrollbars="vertical">
-                    <Flex direction="column" flexGrow="1">
-                      <Box>Chat Box</Box>
-                      <Box>Chat Box</Box>
-                      <Box>Chat Box</Box>
-                    </Flex>
-                  </ScrollArea> */}
-
-                    {/* <Box>Chat Input</Box> */}
                   </Flex>
                 </Flex>
               </Card>
             </Box>
           </ScrollArea>
         </Container>
-
-        {/* <Button asChild>
-            <Link to="/logout">Logout</Link>
-          </Button>
-          <h2>{JSON.stringify(friends)}</h2>
-          <Outlet /> */}
       </UserProvider>
     </SocketProvider>
   );
 }
-
-// <Container height="100svh">
-//   <Flex
-//     height="100%"
-//     p={{ md: "2rem" }}
-//     minHeight="24rem"
-//     overflow="auto"
-
-//   >
-//     <Flex
-//       direction="column"
-//       minWidth="16rem"
-//       maxWidth="20rem"
-//       flexGrow="1"
-//     >
-//       <Box minHeight="4rem">chat</Box>
-//       <Box minHeight="3rem">search</Box>
-//       <Box minHeight="2rem">tag</Box>
-//       <ScrollArea scrollbars="vertical">
-//         <Flex direction="column">
-//           <Text>deded dededed de</Text>
-//           <Text>deded dededed de</Text>
-//           <Text>deded dededed de</Text>
-//           <Text>deded dededed de</Text>
-//           <Text>deded dededed de</Text>
-//           <Text>deded dededed de</Text>
-//           <Text>deded dededed de</Text>
-//           <Text>deded dededed de</Text>
-//           <Text>deded dededed de</Text>
-//           <Text>deded dededed de</Text>
-//           <Text>deded dededed de</Text>
-//           <Text>deded dededed de</Text>
-//         </Flex>
-//       </ScrollArea>
-//       <Box minHeight="4rem">2</Box>
-//     </Flex>
-
-//     <Flex direction="column" flexGrow="1" minWidth="24rem">
-//       <Box minHeight="4rem">chat name</Box>
-//       <ScrollArea scrollbars="vertical">
-//         <Flex direction="column">
-//           <Box>chat</Box>
-//           <Box>chat</Box>
-//           <Box>chat</Box>
-//           <Box>chat</Box>
-//           <Box>chat</Box>
-//           <Box>chat</Box>
-//           <Box>chat</Box>
-//           <Box>chat</Box>
-//           <Box>chat</Box>
-//           <Box>chat</Box>
-//           <Box>chat</Box>
-//           <Box>chat</Box>
-//         </Flex>
-//       </ScrollArea>
-//       <Box minHeight="4rem">chat input text</Box>
-//     </Flex>
-//   </Flex>
-// </Container>
