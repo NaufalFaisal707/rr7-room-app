@@ -1,17 +1,4 @@
-import {
-  type RouteConfig,
-  index,
-  layout,
-  route,
-} from "@react-router/dev/routes";
+import { type RouteConfig } from "@react-router/dev/routes";
+import { flatRoutes } from "@react-router/fs-routes";
 
-export default [
-  route("login", "routes/login.tsx"),
-  route("register", "routes/register.tsx"),
-  route("logout", "routes/logout.ts"),
-
-  layout("routes/chat/layout.tsx", [
-    index("routes/chat/index.tsx"),
-    route(":frendId", "routes/chat/$frendId.tsx"),
-  ]),
-] satisfies RouteConfig;
+export default flatRoutes() satisfies RouteConfig;

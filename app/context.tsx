@@ -20,7 +20,7 @@ export function SocketProvider({ socket, children }: SocketProviderProps) {
   );
 }
 
-export type SafeUser = Omit<User, "password">;
+export type SafeUser = Omit<User, "password" | "logout_at">;
 
 type UserContextType = {
   user: SafeUser | undefined;

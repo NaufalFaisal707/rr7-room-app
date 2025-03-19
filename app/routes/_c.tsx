@@ -12,9 +12,16 @@ import {
   Text,
   TextField,
 } from "@radix-ui/themes";
-import type { Route } from "./+types/layout";
+import type { Route } from "./+types/_c";
 import { useEffect, useState } from "react";
-import { Link, Outlet, redirect, replace } from "react-router";
+import {
+  data,
+  Link,
+  Outlet,
+  redirect,
+  replace,
+  useLoaderData,
+} from "react-router";
 import { io, type Socket } from "socket.io-client";
 import { SocketProvider, UserProvider, type SafeUser } from "~/context";
 import {
@@ -50,7 +57,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const rcp = verifyRefreshToken(await refreshCookie.parse(getAllCookies));
 
   if (acp) {
-    const { id, iat, exp } = acp as { id: string; iat: number; exp: number };
+    const { id, iat } = acp as { id: string; iat: number };
 
     const findUserByUnique = await prisma.user.findUnique({
       where: { id },
@@ -66,9 +73,8 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
     const lastLogout = findUserByUnique?.logout_at
       ? new Date(findUserByUnique.logout_at).getTime()
       : 0;
-    const tokenIssuedAt = iat * 1000;
 
-    if (!findUserByUnique || tokenIssuedAt < lastLogout) {
+    if (!findUserByUnique || iat * 1000 < lastLogout) {
       throw replace("/login", {
         headers: [
           ["Set-Cookie", await clearAccessCookie.serialize("")],
@@ -77,11 +83,13 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
       });
     }
 
-    return Response.json(findUserByUnique);
+    const { logout_at, ...nestedFindUserByUnique } = findUserByUnique;
+
+    return data(nestedFindUserByUnique);
   }
 
   if (rcp) {
-    const { id, iat, exp } = rcp as { id: string; iat: number; exp: number };
+    const { id, iat } = rcp as { id: string; iat: number };
 
     const findUserByUnique = await prisma.user.findUnique({
       where: { id },
@@ -97,9 +105,8 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
     const lastLogout = findUserByUnique?.logout_at
       ? new Date(findUserByUnique.logout_at).getTime()
       : 0;
-    const tokenIssuedAt = iat * 1000;
 
-    if (!findUserByUnique || tokenIssuedAt < lastLogout) {
+    if (!findUserByUnique || iat * 1000 < lastLogout) {
       throw replace("/login", {
         headers: [
           ["Set-Cookie", await clearAccessCookie.serialize("")],
@@ -108,9 +115,11 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
       });
     }
 
+    const { logout_at, ...nestedFindUserByUnique } = findUserByUnique;
+
     const gat = generateAccessToken(id);
 
-    return Response.json(findUserByUnique, {
+    return data(nestedFindUserByUnique, {
       headers: {
         "Set-Cookie": await accessCookie.serialize(gat),
       },
@@ -128,9 +137,7 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
 export default function ChatLayout({ loaderData }: Route.ComponentProps) {
   const [user, setUser] = useState<SafeUser>();
   const [socket, setSocket] = useState<Socket>();
-  const [friends, setFriends] = useState<
-    Omit<SafeUser, "username" | "created_at" | "logout_at">[]
-  >([]);
+  const [friends, setFriends] = useState<SafeUser[]>([]);
 
   useEffect(() => {
     setUser(loaderData);
